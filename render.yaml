@@ -3,8 +3,8 @@ services:
     name: game-access-simplifier
     env: static
     buildCommand: |
-      npm ci  # Use clean install instead of npm install
-      NODE_ENV=production npm run build  # Explicitly set NODE_ENV
+      npm ci
+      NODE_ENV=production npx --no -- vite build
     staticPublishPath: ./dist
     autoDeploy: true
     
