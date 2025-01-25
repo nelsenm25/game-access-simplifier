@@ -4,8 +4,9 @@ services:
     env: static
     buildCommand: |
       npm ci
-      npm install vite@5.4.1 @vitejs/plugin-react-swc@3.5.0
-      ./node_modules/.bin/vite build
+      export PATH="$PATH:./node_modules/.bin"
+      npm install -D vite@5.4.1 @vitejs/plugin-react-swc@3.5.0
+      npm exec vite build
     staticPublishPath: ./dist
     autoDeploy: true
     
