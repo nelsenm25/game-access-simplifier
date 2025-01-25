@@ -1,20 +1,25 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
 
   useEffect(() => {
     // Three.js Scene Setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    rendererRef.current = renderer;
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('canvas-container')?.appendChild(renderer.domElement);
+    const container = document.getElementById('canvas-container');
+    if (container) {
+      container.appendChild(renderer.domElement);
+    }
 
     // Particle System
     const particlesGeometry = new THREE.BufferGeometry();
@@ -79,9 +84,15 @@ const Index = () => {
 
     // Cleanup
     return () => {
-      renderer.dispose();
-      scene.clear();
-      document.getElementById('canvas-container')?.removeChild(renderer.domElement);
+      if (rendererRef.current) {
+        const container = document.getElementById('canvas-container');
+        const canvas = rendererRef.current.domElement;
+        if (container && canvas && container.contains(canvas)) {
+          container.removeChild(canvas);
+        }
+        rendererRef.current.dispose();
+        scene.clear();
+      }
     };
   }, []);
 
