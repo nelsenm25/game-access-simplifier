@@ -3,8 +3,8 @@ services:
     name: game-access-simplifier
     env: static
     buildCommand: |
-      npm install
-      npx vite build
+      npm ci  # Use clean install instead of npm install
+      NODE_ENV=production npm run build  # Explicitly set NODE_ENV
     staticPublishPath: ./dist
     autoDeploy: true
     
@@ -16,6 +16,8 @@ services:
         value: ${VITE_SUPABASE_ANON_KEY}
       - key: NODE_ENV
         value: production
+      - key: NODE_VERSION
+        value: 18
     
     # Build settings with fixed path patterns
     buildFilter:
