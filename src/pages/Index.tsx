@@ -28,10 +28,11 @@ const Index = () => {
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.002,
+      size: 0.005,
       color: 0x00ff8c,
       transparent: true,
-      opacity: 0.7
+      opacity: 0.7,
+      blending: THREE.AdditiveBlending
     });
 
     const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
@@ -68,7 +69,9 @@ const Index = () => {
       torus.rotation.x += 0.01;
       torus.rotation.y += 0.015;
       
-      pointLight.intensity = Math.sin(Date.now() * 0.002) * 0.5 + 0.5;
+      // Mouse movement effect on particles
+      particlesMesh.rotation.y += 0.0005;
+      particlesMesh.rotation.x += 0.0002;
       
       renderer.render(scene, camera);
     }
@@ -78,6 +81,7 @@ const Index = () => {
     return () => {
       renderer.dispose();
       scene.clear();
+      document.getElementById('canvas-container')?.removeChild(renderer.domElement);
     };
   }, []);
 
@@ -115,18 +119,18 @@ const Index = () => {
 
       <section id="home" className="min-h-screen flex items-center justify-center text-center p-4">
         <div className="max-w-3xl">
-          <h1 className="text-6xl font-bold mb-6 animate-bounce bg-gradient-to-r from-[#00ff8c] to-[#ff00ff] bg-clip-text text-transparent">
+          <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-[#00ff8c] to-[#ff00ff] bg-clip-text text-transparent">
             Game Testerz
           </h1>
           <p className="text-xl mb-8 text-white">
             Professional Game Testing Services to Ensure Your Game's Success
           </p>
-          <a 
-            href="#contact"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-[#00ff8c] to-[#ff00ff] text-black font-bold rounded-full hover:scale-105 transition-transform"
+          <Button 
+            onClick={() => navigate('/auth')}
+            className="px-8 py-4 bg-gradient-to-r from-[#00ff8c] to-[#ff00ff] text-black font-bold rounded-full hover:scale-105 transition-transform"
           >
             Get Started
-          </a>
+          </Button>
         </div>
       </section>
 
