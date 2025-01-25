@@ -11,21 +11,24 @@ services:
     # Load environment variables from .env file
     envVars:
       - key: VITE_SUPABASE_URL
-        value: ${VITE_SUPABASE_URL}  # Will be loaded from .env
+        value: ${VITE_SUPABASE_URL}
       - key: VITE_SUPABASE_ANON_KEY
-        value: ${VITE_SUPABASE_ANON_KEY}  # Will be loaded from .env
+        value: ${VITE_SUPABASE_ANON_KEY}
       - key: NODE_ENV
         value: production
     
-    # Build settings
+    # Build settings with fixed path patterns
     buildFilter:
       paths:
-        - src/**/*.{js,jsx,ts,tsx}
+        - src/**/*.js
+        - src/**/*.jsx
+        - src/**/*.ts
+        - src/**/*.tsx
         - package.json
         - package-lock.json
         - vite.config.ts
         - tsconfig.json
-        - .env  # Include .env file in build process
+        - .env
     
     # Basic security headers
     headers:
