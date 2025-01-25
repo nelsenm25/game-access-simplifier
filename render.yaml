@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: game-access-simplifier
+    env: static
+    buildCommand: |
+      npm install
+      npm run build
+    staticPublishPath: ./dist
+    autoDeploy: true
+    
+    # Load environment variables from .env file
+    envVars:
+      - key: VITE_SUPABASE_URL
+        value: ${VITE_SUPABASE_URL}  # Will be loaded from .env
+      - key: VITE_SUPABASE_ANON_KEY
+        value: ${VITE_SUPABASE_ANON_KEY}  # Will be loaded from .env
+      - key: NODE_ENV
+        value: production
+    
+    # Build settings
+    buildFilter:
+      paths:
+        - src/**/*.{js,jsx,ts,tsx}
+        - package.json
+        - package-lock.json
+        - vite.config.ts
+        - tsconfig.json
+        - .env  # Include .env file in build process
+    
+    # Basic security headers
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
