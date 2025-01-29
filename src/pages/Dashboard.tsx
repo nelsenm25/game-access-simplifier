@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import {
   Card,
   CardContent,
@@ -12,12 +12,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Shield, GamepadIcon, Clock, Settings } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [lastLogin, setLastLogin] = useState<string | null>(null);
+  const [newEmail, setNewEmail] = useState('');
+  const [isUpdateEmailOpen, setIsUpdateEmailOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -47,6 +57,26 @@ const Dashboard = () => {
       toast({
         title: "Error signing out",
         description: "There was a problem signing out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateEmail = async () => {
+    try {
+      const { error } = await supabase.auth.updateUser({ email: newEmail });
+      
+      if (error) throw error;
+
+      toast({
+        title: "Email update initiated",
+        description: "Please check your new email for a confirmation link.",
+      });
+      setIsUpdateEmailOpen(false);
+    } catch (error: any) {
+      toast({
+        title: "Error updating email",
+        description: error.message || "There was a problem updating your email. Please try again.",
         variant: "destructive",
       });
     }
@@ -136,12 +166,36 @@ const Dashboard = () => {
                 <h3 className="font-medium">Email</h3>
                 <p className="text-sm text-gray-400">{user.email}</p>
               </div>
-              <Button 
-                variant="outline"
-                className="border-[#00ff8c]/20 hover:bg-[#00ff8c]/10"
-              >
-                Update Email
-              </Button>
+              <Dialog open={isUpdateEmailOpen} onOpenChange={setIsUpdateEmailOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline"
+                    className="border-[#00ff8c]/20 hover:bg-[#00ff8c]/10"
+                  >
+                    Update Email
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-black/90 border-[#00ff8c]/20">
+                  <DialogHeader>
+                    <DialogTitle>Update Email Address</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <Input
+                      type="email"
+                      placeholder="New email address"
+                      value={newEmail}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                      className="border-[#00ff8c]/20 bg-black/50"
+                    />
+                    <Button 
+                      onClick={handleUpdateEmail}
+                      className="w-full bg-[#00ff8c] hover:bg-[#00ff8c]/80 text-black"
+                    >
+                      Update Email
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             <div className="flex justify-between items-center">
               <div>
