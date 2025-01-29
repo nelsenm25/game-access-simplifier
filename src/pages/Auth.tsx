@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,6 +16,13 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     // Three.js Scene Setup
@@ -113,15 +121,29 @@ const Auth = () => {
         });
         setIsResetPassword(false);
       } else if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth`
+          }
         });
+        
         if (error) throw error;
-        toast({
-          title: "Success!",
-          description: "Please check your email to verify your account.",
-        });
+        
+        if (data.user?.identities?.length === 0) {
+          toast({
+            title: "Account already exists",
+            description: "Please sign in instead.",
+            variant: "destructive",
+          });
+          setIsSignUp(false);
+        } else {
+          toast({
+            title: "Success!",
+            description: "Please check your email to verify your account.",
+          });
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -129,6 +151,10 @@ const Auth = () => {
         });
         if (error) throw error;
         navigate('/dashboard');
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
       }
     } catch (error: any) {
       toast({
@@ -176,6 +202,7 @@ const Auth = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={6}
                   className="bg-white/5 border-[#00ff8c]/20 text-white placeholder:text-gray-500"
                 />
               )}
