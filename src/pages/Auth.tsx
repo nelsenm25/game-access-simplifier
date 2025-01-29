@@ -91,8 +91,17 @@ const Auth = () => {
     }
     animate();
 
+    // Handle window resize
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+
     // Cleanup
     return () => {
+      window.removeEventListener('resize', handleResize);
       if (rendererRef.current) {
         const container = document.getElementById('canvas-container');
         const canvas = rendererRef.current.domElement;
